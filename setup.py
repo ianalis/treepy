@@ -44,5 +44,5 @@ setup(
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
 
-    install_requires=['pandas'],
+    install_requires=['pandas', 'numpy', 'seaborn'],
 )
