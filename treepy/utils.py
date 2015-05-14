@@ -1,3 +1,7 @@
+# Copyright (c) 2015 Christian Alis
+#
+# See the file LICENSE for copying permission.
+
 import pandas as pd
 
 def to_pandas_tseries(tseries):

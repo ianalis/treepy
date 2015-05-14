@@ -1,3 +1,7 @@
+# Copyright (c) 2015 Christian Alis
+#
+# See the file LICENSE for copying permission.
+
 from __future__ import absolute_import
 
 import json
