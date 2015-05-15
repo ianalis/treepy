@@ -41,5 +41,11 @@ Here is an example session::
     8  0.823189  Table_of_books_of_Judeo-Christian_Scripture  
     9  0.821132           Transmission_and_infection_of_H5N1  
     >>>
+    >>> from treepy.plotting import plot_corr
+    >>> import matplotlib.pyplot as plt
+    >>> plot_corr(results)                                                                                                                                                            
+    <matplotlib.axes._subplots.AxesSubplot object at 0x7f28caec3750>                                                                                                                  
+    >>> plt.show()
+    >>>
 
 For more information, see docstrings.
