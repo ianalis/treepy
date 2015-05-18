@@ -12,11 +12,20 @@ from .utils import to_pandas_tseries
 
 class TreeClient(object):
     """Client for interacting with the tree.mu API"""
-    def __init__(self, platform_url='http://api.tree.mu'):
+    def __init__(self, platform_url='http://api.tree.mu', db=None):
+        """
+        Parameters
+        ----------
+        platform_url : str
+            URL of server including protocol and port
+        db : str
+            database name; server default if `None`
+        """
         self.platform_url = platform_url
+        self.db = db
         
     def get_most_correlated(self, title_or_tseries, results_count=50, 
-                            method='pearson', freq='D'):
+                            method='pearson', freq='D', db=None):
         """
         Return most correlated articles
         
@@ -33,6 +42,8 @@ class TreeClient(object):
             Method of correlation
         freq : "D", "W-SUN", "MS"
             Frequency of time series
+        db : str
+            database name; db defined at `__init__` if `None`
             
         
         Returns
@@ -41,13 +52,17 @@ class TreeClient(object):
             List of most correlated articles ordered by decreasing correlation
             coefficient
         """
-        params = [('results_count', results_count),
-                  ('method', method),
-                  ('freq', freq)]
+        params = {'results_count': results_count,
+                  'method': method,
+                  'freq': freq}
+        if db is None:
+            db = self.db
+        if db:
+            params['db'] = db            
         if isinstance(title_or_tseries, basestring):
-            params.append(('title', title_or_tseries))
+            params['title'] = title_or_tseries
         else:
-            params.append(('values', title_or_tseries.to_json()))
+            params['values'] = title_or_tseries.to_json()
         
         results = json.load(urlopen(self.platform_url + '/corr/', 
                                     data=urlencode(params)))
@@ -57,7 +72,7 @@ class TreeClient(object):
         
         return results
     
-    def get_page(self, title, freq='D'):
+    def get_page(self, title, freq='D', db=None):
         """
         Get page views time series of a particular article
         
@@ -69,6 +84,8 @@ class TreeClient(object):
             case, underscores and escaped characters
         freq :  "D", "W-SUN", "MS"
             Frequency of time series
+        db : str
+            database name; db defined at `__init__` if `None`
             
             
         Returns
@@ -77,12 +94,17 @@ class TreeClient(object):
             Pageviews normalized with total pageviews
         """
         params = {'freq': freq}
+        if db is None:
+            db = self.db
+        if db:
+            params['db'] = db
+            
         tseries = json.load(urlopen('%s/page/%s?%s' % (self.platform_url,
-                                                     quote(title),
-                                                     urlencode(params))))
+                                                       quote(title),
+                                                       urlencode(params))))
         return to_pandas_tseries(tseries)
     
-    def get_total(self, freq='D'):
+    def get_total(self, freq='D', db=None):
         """
         Get the time series of total pageviews
                 
@@ -90,6 +112,8 @@ class TreeClient(object):
         ----------
         freq :  "D", "W-SUN", "MS"
             Frequency of time series
+        db : str
+            database name; db defined at `__init__` if `None`
             
         
         Returns
@@ -98,7 +122,12 @@ class TreeClient(object):
             Time series of total pageviews
         """
         params = {'freq': freq}
+        if db is None:
+            db = self.db
+        if db:
+            params['db'] = db
+            
         tseries = json.load(urlopen('%s/page/?%s' % (self.platform_url,
-                                                   urlencode(params))))
+                                                     urlencode(params))))
         return to_pandas_tseries(tseries)
     
