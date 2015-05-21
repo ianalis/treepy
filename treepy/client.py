@@ -131,3 +131,39 @@ class TreeClient(object):
                                                      urlencode(params))))
         return to_pandas_tseries(tseries)
     
+    def lookup(self, key, limit=None, db=None):
+        """
+        Return nearest substring matches of key in titles
+        
+        The other Tree API endpoints require a precise title. This 
+        endpoint/method allows a user to find the titles most similar to `key`. 
+        The appropriate `raw_title` can then be selected from the results and 
+        passed on as the `title` parameter in other endpoints.
+        
+        Parameters
+        ----------
+        key : str or unicode
+            Substring to search for in titles
+        limit : int
+            Maximum number of results. Default server limit if `None`.
+        db : str
+            Database name; db defined at `__init__` if `None`
+        
+        
+        Returns
+        -------
+        matches : list of dict
+            Titles that contain `key` as a case-insensitive substring, sorted by
+            increasing Damerau-Levenshtein distance
+        """
+        params = {'key': key}
+        if limit:
+            paras['limit'] = limit
+        if db:
+            params['db'] = db
+            
+        matches = json.load(urlopen('%s/lookup/%s?%s' % (self.platform_url,
+                                                         quote(key),
+                                                         urlencode(params))))
+        return matches
+    

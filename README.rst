@@ -10,10 +10,19 @@ then run `setup.py`::
 
 Here is an example session::
 
+    >>> # Create client
     >>> from treepy.client import TreeClient
     >>> client = TreeClient()
+    >>>
+    >>> # Find raw title most similar to "flu"
+    >>> client.lookup('flu')
+    [{u'raw_title': u'Flu', u'title': u'Flu'}, ..., 
+    {u'raw_title': u'Fluor', u'title': u'Fluor'}]
+    >>>
+    >>> # Get most correlated articles of closest match
     >>> results = client.get_most_correlated('Flu')
     >>>
+    >>> # Convert results to a nicer looking dataframe
     >>> from treepy.utils import results_to_dframe
     >>> results_df = results_to_dframe(results)
     >>> results_df[:10]
@@ -41,6 +50,7 @@ Here is an example session::
     8  0.823189  Table_of_books_of_Judeo-Christian_Scripture  
     9  0.821132           Transmission_and_infection_of_H5N1  
     >>>
+    >>> # Plot correlation coefficient and FDR-corrected p-value of each result
     >>> from treepy.plotting import plot_corr
     >>> import matplotlib.pyplot as plt
     >>> plot_corr(results)                                                                                                                                                            
