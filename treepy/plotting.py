@@ -2,10 +2,14 @@
 #
 # See the file LICENSE for copying permission.
 
+from __future__ import absolute_import
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from urllib import unquote
+from scipy.stats import zscore
 
 def plot_corr(results):
     """
@@ -48,3 +52,35 @@ def plot_corr(results):
     legend.get_frame().set_facecolor('w')
     fig.tight_layout()
     return ax
+
+def plot_max(tseries, results, legend_label='', axis_label='', n=0):
+    topp_tseries = results[n]['tseries']
+    topp_tseries = topp_tseries[topp_tseries.notnull()]
+    
+    limits = (max(tseries.index[0], topp_tseries.index[0]),
+              min(tseries.index[-1], topp_tseries.index[-1]))
+    fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+    
+    tseries.plot(ax=ax1, label=legend_label, color='b')
+    ax1.set_ylabel(axis_label)
+    lines, labels = ax1.get_legend_handles_labels()
+        
+    ax1b = topp_tseries.plot(ax=ax1, color='g', secondary_y=True,
+                           label=unquote(results[n]['title']).replace('_', ' '))
+    
+    ax1b.set_ylabel('Normalized page views')
+    lines.extend(ax1b.get_legend_handles_labels()[0])
+    labels.extend(ax1b.get_legend_handles_labels()[1])
+    ax1b.legend(lines, labels)
+    
+    ((tseries - tseries.mean()) / tseries.std()).plot(ax=ax2, color='b', 
+                                                      label=legend_label)
+    ((topp_tseries - topp_tseries.mean()) / topp_tseries.std()).plot(ax=ax2,
+                                                                     color='g',
+                        label=unquote(results[n]['title']).replace('_', ' '))
+    
+    ax2.set_xlim(*limits)
+    ax2.set_ylabel('z-score')
+    ax2.legend()
+    
+    fig.tight_layout()
